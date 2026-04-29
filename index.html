@@ -1,0 +1,2308 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ammireddy Ajay Reddy | Creative Technologist</title>
+    <meta name="description" content="An immersive 3D portfolio experience.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/@studio-freight/lenis@1.0.29/dist/lenis.min.js"></script>
+    <!-- Markdown Parser for AI responses -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <style>
+        /* -------------------------------------------------------------------------- */
+        /* CORE VARIABLES                       */
+        /* -------------------------------------------------------------------------- */
+        :root {
+            --c-dark: #050505;
+            --c-light: #ffffff;
+            --c-accent: #ff2e63;
+            /* Neon Red/Pink */
+            --c-accent-2: #08d9d6;
+            /* Neon Cyan */
+            --font-display: 'Syncopate', sans-serif;
+            --font-body: 'Space Grotesk', sans-serif;
+            --easing: cubic-bezier(0.645, 0.045, 0.355, 1);
+
+            /* Dynamic Variables for Theme */
+            --bg-body: #050505;
+            --text-main: #ffffff;
+            --card-bg: rgba(20, 20, 20, 0.6);
+            --card-border: rgba(255, 255, 255, 0.05);
+            --card-shadow: none;
+            --input-border: rgba(255, 255, 255, 0.2);
+            --input-placeholder: rgba(255, 255, 255, 0.4);
+
+            /* SPECIFIC VARIABLES FOR HERO TEXT EFFECT */
+            --hero-stroke: rgba(255, 255, 255, 0.5);
+            --hero-grad-start: #e2e8f0;
+            /* gray-200 */
+            --hero-grad-end: #ffffff;
+            /* white */
+        }
+
+        /* -------------------------------------------------------------------------- */
+        /* LIGHT MODE OVERRIDES                  */
+        /* -------------------------------------------------------------------------- */
+        body.light-mode {
+            --bg-body: #f0f2f5;
+            /* Soft White */
+            --text-main: #1a1a1a;
+            --c-accent-2: #008c8a;
+            /* Darker Cyan for visibility */
+            --card-bg: rgba(255, 255, 255, 0.75);
+            --card-border: rgba(0, 0, 0, 0.1);
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --input-border: rgba(0, 0, 0, 0.2);
+            --input-placeholder: rgba(0, 0, 0, 0.4);
+
+            /* HERO TEXT LIGHT MODE COLORS */
+            --hero-stroke: rgba(0, 0, 0, 0.5);
+            /* Dark stroke */
+            --hero-grad-start: #4a4a4a;
+            /* Dark Grey */
+            --hero-grad-end: #000000;
+            /* Black */
+        }
+
+        /* Fix Gray Text Contrast in Light Mode */
+        body.light-mode .text-slate-300,
+        body.light-mode .text-slate-400,
+        body.light-mode .text-slate-500 {
+            color: #4b5563;
+        }
+
+        body.light-mode .text-white {
+            color: #111;
+        }
+
+        /* Invert Marquee in Light Mode */
+        body.light-mode .marquee-container {
+            background: #1a1a1a;
+            color: white;
+        }
+
+        /* -------------------------------------------------------------------------- */
+        /* RESET & BASE                       */
+        /* -------------------------------------------------------------------------- */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html.lenis {
+            height: auto;
+        }
+
+        .lenis.lenis-smooth {
+            scroll-behavior: auto;
+        }
+
+        .lenis.lenis-smooth [data-lenis-prevent] {
+            overscroll-behavior: contain;
+        }
+
+        .lenis.lenis-stopped {
+            overflow: hidden;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: var(--font-body);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            cursor: none;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+
+        a,
+        button,
+        input,
+        textarea,
+        .btn-magnetic {
+            cursor: none;
+        }
+
+        /* -------------------------------------------------------------------------- */
+        /* UI TOGGLE BUTTONS (THEME & AI)       */
+        /* -------------------------------------------------------------------------- */
+        .floating-ui-btn {
+            position: fixed;
+            bottom: 30px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Theme Toggle (Right) */
+        #theme-toggle {
+            right: 30px;
+        }
+
+        /* AI Assistant (Left) - NEW AVATAR STYLE */
+        #ai-toggle {
+            left: 30px;
+            width: 70px;
+            height: 70px;
+            border: none;
+            background: transparent;
+            box-shadow: none;
+            overflow: visible;
+            /* Allow glow to spill out */
+            animation: none;
+            /* Handled by inner elements */
+        }
+
+        .ai-avatar-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform-style: preserve-3d;
+            perspective: 500px;
+        }
+
+        /* Holographic Ring */
+        .ai-ring {
+            position: absolute;
+            inset: -5px;
+            border-radius: 50%;
+            border: 2px solid var(--c-accent-2);
+            border-top-color: transparent;
+            border-bottom-color: transparent;
+            animation: spinRing 4s linear infinite;
+            box-shadow: 0 0 15px var(--c-accent-2), inset 0 0 10px var(--c-accent-2);
+            opacity: 0.8;
+        }
+
+        .ai-ring::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            border: 1px dashed rgba(255, 255, 255, 0.5);
+            animation: spinRing 10s linear infinite reverse;
+        }
+
+        @keyframes spinRing {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .ai-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            /* This will be animated by JS for the "Look" effect */
+            transition: transform 0.1s ease-out;
+            z-index: 2;
+            background: #111;
+            /* Fallback bg */
+        }
+
+        body.light-mode .floating-ui-btn {
+            background: rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.2);
+        }
+
+        /* Reset specific styles for the AI button in light mode since it has custom img */
+        body.light-mode #ai-toggle {
+            background: transparent;
+            border: none;
+        }
+
+        .floating-ui-btn:not(#ai-toggle):hover {
+            transform: scale(1.1);
+            background: var(--c-accent-2);
+            border-color: var(--c-accent-2);
+            color: black !important;
+        }
+
+        .floating-ui-btn:not(#ai-toggle):hover i {
+            color: black !important;
+        }
+
+        /* -------------------------------------------------------------------------- */
+        /* AI CHAT MODAL                      */
+        /* -------------------------------------------------------------------------- */
+        #ai-modal {
+            position: fixed;
+            bottom: 110px;
+            /* Moved up slightly to clear larger avatar */
+            left: 30px;
+            width: 350px;
+            height: 500px;
+            background: rgba(10, 10, 10, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            z-index: 9998;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+            pointer-events: none;
+            transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        #ai-modal.active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+
+        .ai-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .ai-body {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            font-size: 0.9rem;
+            position: relative;
+        }
+
+        .ai-footer {
+            padding: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            /* Changed for file chip */
+            gap: 10px;
+        }
+
+        .ai-input-wrapper {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .ai-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: white;
+            font-family: var(--font-body);
+            outline: none;
+            font-size: 0.9rem;
+        }
+
+        .ai-input:focus {
+            border-color: var(--c-accent-2);
+        }
+
+        .ai-btn-icon {
+            background: transparent;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .ai-btn-icon:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: white;
+        }
+
+        .ai-send {
+            background: var(--c-accent-2);
+            color: black;
+            border-color: var(--c-accent-2);
+        }
+
+        .ai-send:hover {
+            transform: scale(1.05);
+            background: var(--c-accent-2);
+        }
+
+        /* File Upload UI */
+        .file-preview-chip {
+            display: none;
+            /* Hidden by default */
+            align-items: center;
+            gap: 8px;
+            background: rgba(8, 217, 214, 0.1);
+            border: 1px solid rgba(8, 217, 214, 0.3);
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            color: var(--c-accent-2);
+            width: fit-content;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .file-preview-chip.active {
+            display: flex;
+        }
+
+        .drop-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            border: 2px dashed var(--c-accent-2);
+            margin: 10px;
+            border-radius: 10px;
+        }
+
+        #ai-modal.drag-over .drop-overlay {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Messages */
+        .message {
+            max-width: 85%;
+            padding: 10px 14px;
+            border-radius: 12px;
+            line-height: 1.4;
+            font-size: 0.85rem;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background: var(--c-accent);
+            color: white;
+            border-bottom-right-radius: 2px;
+        }
+
+        .message.bot {
+            align-self: flex-start;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+            border-bottom-left-radius: 2px;
+        }
+
+        .message p {
+            margin-bottom: 0.5em;
+        }
+
+        .message p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Typing Indicator */
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+            padding: 5px 0;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .dot:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .dot:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            80%,
+            100% {
+                transform: scale(0);
+            }
+
+            40% {
+                transform: scale(1);
+            }
+        }
+
+        /* -------------------------------------------------------------------------- */
+        /* CUSTOM HUD CURSOR                  */
+        /* -------------------------------------------------------------------------- */
+        .cursor-ui {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 40px;
+            height: 40px;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 10000;
+            mix-blend-mode: difference;
+        }
+
+        .cursor-dot {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .cursor-ring {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 1px dashed rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            animation: rotateCursor 10s linear infinite;
+            transition: width 0.3s ease, height 0.3s ease, border-color 0.3s ease;
+        }
+
+        .cursor-ring::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: 50%;
+            width: 2px;
+            height: 5px;
+            background: white;
+            transform: translateX(-50%);
+        }
+
+        .cursor-ring::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            width: 2px;
+            height: 5px;
+            background: white;
+            transform: translateX(-50%);
+        }
+
+        body.hover-active .cursor-ring {
+            width: 60px;
+            height: 60px;
+            border-style: solid;
+            border-width: 2px;
+            border-color: var(--c-accent-2);
+            top: -10px;
+            left: -10px;
+            animation-duration: 2s;
+        }
+
+        body.hover-active .cursor-dot {
+            background: var(--c-accent-2);
+            transform: translate(-50%, -50%) scale(1.5);
+        }
+
+        body.cursor-clicked .cursor-ring {
+            transform: scale(0.8);
+        }
+
+        @keyframes rotateCursor {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* -------------------------------------------------------------------------- */
+        /* UTILITIES                          */
+        /* -------------------------------------------------------------------------- */
+        .clip-text {
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+        }
+
+        .glass-panel {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            box-shadow: var(--card-shadow);
+            transition: background 0.5s ease, border-color 0.5s ease;
+        }
+
+        .noise-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9000;
+            opacity: 0.05;
+            background: url('https://grainy-gradients.vercel.app/noise.svg');
+        }
+
+        /* -------------------------------------------------------------------------- */
+        /* INTERACTIVE CONTACT TEXT EFFECTS */
+        /* -------------------------------------------------------------------------- */
+        .interactive-char {
+            display: inline-block;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            position: relative;
+        }
+
+        /* The Hover Effect */
+        .interactive-char:hover {
+            color: var(--c-accent-2);
+            transform: scale(1.5) translateY(-5px);
+            text-shadow: 0 0 10px var(--c-accent-2);
+            z-index: 10;
+        }
+
+        /* -------------------------------------------------------------------------- */
+        /* ADVANCED COPY BUTTON STYLES (FIXED) */
+        /* -------------------------------------------------------------------------- */
+        .contact-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+        }
+
+        .copy-btn {
+            position: relative;
+            opacity: 0;
+            transform: translateX(-15px) scale(0.8);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            /* Removed movement on hover */
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-main);
+            pointer-events: none;
+            overflow: visible;
+            cursor: pointer;
+            /* Ensure pointer */
+        }
+
+        .contact-row:hover .copy-btn {
+            opacity: 1;
+            transform: translateX(0) scale(1);
+            pointer-events: auto;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--c-accent-2);
+            color: var(--c-accent-2);
+            /* NO SCALE/TRANSLATE HERE to prevent moving away */
+            box-shadow: 0 0 15px rgba(8, 217, 214, 0.2);
+        }
+
+        /* Success Tooltip */
+        .copy-tooltip {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            background: var(--c-accent-2);
+            color: black;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 4px 8px;
+            border-radius: 4px;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            white-space: nowrap;
+            letter-spacing: 0.05em;
+        }
+
+        .copy-btn.copied .copy-tooltip {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-5px);
+        }
+
+        /* Light mode adjustments */
+        body.light-mode .copy-btn {
+            background: rgba(0, 0, 0, 0.05);
+            border-color: rgba(0, 0, 0, 0.1);
+            color: #1a1a1a;
+        }
+
+        body.light-mode .copy-btn:hover {
+            background: white;
+            color: var(--c-accent-2);
+        }
+
+        /* -------------------------------------------------------------------------- */
+        /* HYPER 3D SOCIAL BUTTONS */
+        /* -------------------------------------------------------------------------- */
+        .social-btn {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 4rem;
+            height: 4rem;
+            background: transparent;
+            perspective: 500px;
+            cursor: pointer;
+        }
+
+        /* The base container that tilts */
+        .social-base {
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transform-style: preserve-3d;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* The Icon that levitates */
+        .social-btn i {
+            font-size: 1.5rem;
+            color: white;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform: translateZ(0);
+        }
+
+        /* Brand Colors */
+        .social-github .social-base::before {
+            background: #6e5494;
+        }
+
+        .social-linkedin .social-base::before {
+            background: #0077b5;
+        }
+
+        .social-instagram .social-base::before {
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+        }
+
+        /* Inner Glow Layer */
+        .social-base::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 16px;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            filter: blur(10px);
+            transform: translateZ(-10px);
+        }
+
+        /* Hover Effects */
+        .social-btn:hover .social-base {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: rotateX(20deg) rotateY(-15deg);
+            /* Default tilt, JS will override */
+            box-shadow: -10px 10px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .social-btn:hover i {
+            transform: translateZ(40px) scale(1.2);
+            /* Pop out */
+            text-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .social-btn:hover .social-base::before {
+            opacity: 0.6;
+        }
+
+        /* Light Mode Fixes */
+        body.light-mode .social-base {
+            background: rgba(0, 0, 0, 0.05);
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-mode .social-btn i {
+            color: #333;
+        }
+
+        body.light-mode .social-btn:hover i {
+            color: white;
+        }
+
+        /* -------------------------------------------------------------------------- */
+        /* FORM STYLES */
+        /* -------------------------------------------------------------------------- */
+        .form-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--input-border);
+            padding: 15px 0;
+            color: var(--text-main);
+            font-family: var(--font-body);
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus {
+            border-color: var(--c-accent-2);
+        }
+
+        .form-input::placeholder {
+            color: var(--input-placeholder);
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+        }
+
+        /* -------------------------------------------------------------------------- */
+        /* COMPONENTS                         */
+        /* -------------------------------------------------------------------------- */
+
+        /* WEBGL CANVAS CONTAINER */
+        #webgl-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        /* PRELOADER UPDATED CSS */
+        .preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--c-dark);
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            transition: transform 0.8s cubic-bezier(0.7, 0, 0.3, 1);
+        }
+
+        .loader-text {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            overflow: hidden;
+            color: white;
+            /* Always white in loader */
+        }
+
+        .loader-bar-wrapper {
+            width: 200px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loader-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0%;
+            background: var(--c-accent-2);
+            /* Instant animation start via CSS to prevent "stuck" feeling */
+            animation: loadProgress 4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+        @keyframes loadProgress {
+            0% {
+                width: 0%;
+            }
+
+            100% {
+                width: 90%;
+            }
+
+            /* Stalls at 90% until JS finishes it */
+        }
+
+        /* NAVIGATION */
+        .nav-link {
+            position: relative;
+            font-family: var(--font-display);
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.6);
+            transition: color 0.3s;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0%;
+            height: 1px;
+            background: var(--c-accent);
+            transition: width 0.3s var(--easing);
+        }
+
+        .nav-link:hover {
+            color: white;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        /* HERO TYPOGRAPHY & EFFECTS */
+        .hero-title {
+            font-family: var(--font-display);
+            font-size: clamp(3rem, 10vw, 9rem);
+            line-height: 0.9;
+            text-transform: uppercase;
+            font-weight: 700;
+            mix-blend-mode: difference;
+        }
+
+        /* CUSTOM HERO TEXT STYLES (Restored) */
+        .hero-stroked {
+            color: transparent;
+            background-clip: text;
+            -webkit-background-clip: text;
+            /* Use variables for gradient */
+            background-image: linear-gradient(to right, var(--hero-grad-start), var(--hero-grad-end));
+            /* Use variable for stroke */
+            -webkit-text-stroke: 1px var(--hero-stroke);
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1rem, 2vw, 1.5rem);
+            font-weight: 300;
+            letter-spacing: 0.05em;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* SCROLL DOWN INDICATOR */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            opacity: 0.5;
+        }
+
+        .mouse {
+            width: 30px;
+            height: 50px;
+            border: 2px solid var(--text-main);
+            border-radius: 20px;
+            position: relative;
+        }
+
+        .wheel {
+            width: 4px;
+            height: 8px;
+            background: var(--text-main);
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+            animation: scrollWheel 2s infinite;
+        }
+
+        @keyframes scrollWheel {
+            0% {
+                top: 10px;
+                opacity: 1;
+            }
+
+            100% {
+                top: 30px;
+                opacity: 0;
+            }
+        }
+
+        /* MAGNETIC BUTTON */
+        .btn-magnetic {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 40px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 100px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+            cursor: pointer;
+            color: var(--text-main);
+        }
+
+        body.light-mode .btn-magnetic {
+            border-color: rgba(0, 0, 0, 0.2);
+            color: #1a1a1a;
+        }
+
+        .btn-magnetic .btn-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--text-main);
+            transform: scaleY(0);
+            transform-origin: bottom;
+            transition: transform 0.5s var(--easing);
+            z-index: -1;
+        }
+
+        .btn-magnetic:hover {
+            color: var(--bg-body);
+            border-color: var(--text-main);
+        }
+
+        .btn-magnetic:hover .btn-fill {
+            transform: scaleY(1);
+        }
+
+        /* ADVANCED 3D BENTO GRID */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 24px;
+            padding: 20px 0;
+            perspective: 2000px;
+            /* Deep perspective for 3D tilt */
+        }
+
+        .bento-item {
+            position: relative;
+            border-radius: 24px;
+            overflow: hidden;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            box-shadow: var(--card-shadow);
+            transform-style: preserve-3d;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.5s ease;
+            opacity: 1;
+        }
+
+        .bento-item:hover {
+            border-color: var(--c-accent-2);
+            box-shadow: 0 20px 50px rgba(8, 217, 214, 0.15);
+            z-index: 10;
+        }
+
+        .bento-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: filter 0.5s ease, transform 0.5s ease;
+            filter: grayscale(100%) contrast(1.1) brightness(0.8);
+            transform: scale(1.05) translateZ(0);
+        }
+
+        .bento-item:hover .bento-img {
+            filter: grayscale(0%) contrast(1.1) brightness(1.1) saturate(1.2);
+            transform: scale(1.1) translateZ(0);
+        }
+
+        .bento-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.95), transparent 60%);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 40px;
+            transform: translateZ(30px);
+            /* Pop out from card */
+            opacity: 0;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            color: white;
+            /* Overlay text always white */
+        }
+
+        .bento-item:hover .bento-overlay {
+            opacity: 1;
+            transform: translateZ(40px) translateY(0);
+        }
+
+        /* Glare Effect */
+        .card-glare {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.2), transparent 60%);
+            opacity: 0;
+            mix-blend-mode: overlay;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            transform: translateZ(1px);
+        }
+
+        .bento-item:hover .card-glare {
+            opacity: 1;
+        }
+
+        /* MARQUEE */
+        .marquee-container {
+            overflow: hidden;
+            white-space: nowrap;
+            padding: 40px 0;
+            background: white;
+            color: black;
+            transform: rotate(-2deg) scale(1.1);
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 20s linear infinite;
+        }
+
+        .marquee-text {
+            font-family: var(--font-display);
+            font-size: 6vw;
+            font-weight: 700;
+            margin-right: 40px;
+            text-transform: uppercase;
+        }
+
+        @keyframes marquee {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+        /* GLITCH EFFECT */
+        .glitch-wrapper {
+            position: relative;
+        }
+
+        .glitch {
+            position: relative;
+            color: var(--text-main);
+        }
+
+        /* Ensure the gradient text override stays transparent for the gradient to show */
+        .glitch.hero-stroked {
+            color: transparent;
+        }
+
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* If it's stroked text, try to match, but simplified */
+            color: var(--text-main);
+        }
+
+        /* Special handling for the stroked text glitch to prevent it covering the gradient */
+        .glitch.hero-stroked::before,
+        .glitch.hero-stroked::after {
+            color: transparent;
+            -webkit-text-stroke: 1px var(--hero-stroke);
+        }
+
+        .glitch::before {
+            left: 2px;
+            text-shadow: -1px 0 var(--c-accent);
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim-1 5s infinite linear alternate-reverse;
+        }
+
+        .glitch::after {
+            left: -2px;
+            text-shadow: -1px 0 var(--c-accent-2);
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim-2 5s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim-1 {
+            0% {
+                clip: rect(20px, 9999px, 81px, 0);
+            }
+
+            20% {
+                clip: rect(66px, 9999px, 14px, 0);
+            }
+
+            100% {
+                clip: rect(89px, 9999px, 34px, 0);
+            }
+        }
+
+        @keyframes glitch-anim-2 {
+            0% {
+                clip: rect(10px, 9999px, 91px, 0);
+            }
+
+            20% {
+                clip: rect(33px, 9999px, 14px, 0);
+            }
+
+            100% {
+                clip: rect(12px, 9999px, 54px, 0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- THEME TOGGLE (BOTTOM RIGHT) -->
+    <div id="theme-toggle" class="floating-ui-btn hover-magnetic" data-strength="15">
+        <i data-lucide="sun" id="theme-icon" class="text-white w-6 h-6"></i>
+    </div>
+
+    <!-- AI ASSISTANT TOGGLE (BOTTOM LEFT) - 3D AVATAR -->
+    <div id="ai-toggle" class="floating-ui-btn" title="Ask A.I.D.A">
+        <div class="ai-avatar-container">
+            <div class="ai-ring"></div>
+            <!-- Placeholder for your 3D Image. Replace 'src' with your actual image URL if needed -->
+            <!-- Using a high-quality 3D robot placeholder that matches your description -->
+            <img src="Bumble Bee.png" alt="AI Avatar" class="ai-img" id="ai-avatar-img">
+        </div>
+    </div>
+
+    <!-- AI CHAT MODAL -->
+    <div id="ai-modal">
+        <!-- Drag & Drop Overlay -->
+        <div class="drop-overlay" id="drop-overlay">
+            <i data-lucide="upload-cloud" class="w-10 h-10 text-cyan-400"></i>
+            <span class="text-white font-bold tracking-widest text-sm">DROP TO UPLOAD</span>
+        </div>
+
+        <div class="ai-header">
+            <div class="flex items-center gap-2">
+                <i data-lucide="sparkles" class="text-cyan-400 w-4 h-4"></i>
+                <span class="font-[Syncopate] font-bold text-xs tracking-widest text-white">Neural Link</span>
+            </div>
+            <button id="close-ai" class="text-white/50 hover:text-white transition-colors">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+        </div>
+        <div class="ai-body" id="ai-messages">
+            <!-- Initial Message -->
+            <div class="message bot">
+                <p>Hello. I am Bumble Bee, Ajay's digital assistant. How can I help you navigate this portfolio?</p>
+            </div>
+        </div>
+        <div class="ai-footer">
+            <div id="file-chip" class="file-preview-chip">
+                <i data-lucide="file" class="w-3 h-3"></i>
+                <span id="filename">image.png</span>
+                <button id="remove-file" class="hover:text-white"><i data-lucide="x" class="w-3 h-3"></i></button>
+            </div>
+
+            <div class="ai-input-wrapper">
+                <button id="ai-attach" class="ai-btn-icon" title="Attach File">
+                    <i data-lucide="paperclip" class="w-4 h-4"></i>
+                </button>
+                <input type="file" id="ai-file-input" hidden>
+
+                <input type="text" id="ai-input" class="ai-input" placeholder="Ask anything..." autocomplete="off">
+                <button id="ai-send" class="ai-btn-icon ai-send">
+                    <i data-lucide="send" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="cursor-ui" id="cursor-ui">
+        <div class="cursor-dot"></div>
+        <div class="cursor-ring"></div>
+    </div>
+
+    <div class="noise-overlay"></div>
+
+    <div class="preloader" id="preloader">
+        <div class="loader-text">Initializing Core</div>
+        <div class="loader-bar-wrapper">
+            <div class="loader-bar" id="loader-bar"></div>
+        </div>
+    </div>
+
+    <div id="webgl-container"></div>
+
+    <nav class="fixed top-0 w-full z-50 px-8 py-6 flex justify-between items-center mix-blend-difference">
+        <a href="#" class="text-2xl font-bold tracking-tighter font-[Syncopate] hover-magnetic text-white"
+            data-strength="20">AAR.</a>
+
+        <div class="hidden md:flex gap-10">
+            <a href="#about" class="nav-link hover-magnetic" data-strength="15">About</a>
+            <a href="#work" class="nav-link hover-magnetic" data-strength="15">Work</a>
+            <a href="#lab" class="nav-link hover-magnetic" data-strength="15">Lab</a>
+            <a href="#contact" class="nav-link hover-magnetic" data-strength="15">Contact</a>
+        </div>
+
+        <button class="md:hidden text-white">
+            <i data-lucide="menu" class="w-8 h-8"></i>
+        </button>
+    </nav>
+
+    <main>
+
+        <section id="home" class="h-screen w-full flex items-center justify-center relative px-6">
+            <div class="text-center z-10 relative">
+                <div class="overflow-hidden mb-2">
+                    <h2 class="hero-subtitle text-slate-300">CREATIVE TECHNOLOGIST & ENGINEER</h2>
+                </div>
+
+                <div class="glitch-wrapper mb-6">
+                    <h1 class="hero-title glitch" data-text="AMMIREDDY">AMMIREDDY</h1>
+                    <h1 class="hero-title glitch hero-stroked" data-text="AJAY REDDY">AJAY REDDY</h1>
+                </div>
+
+                <p class="max-w-2xl mx-auto text-lg md:text-xl text-slate-400 leading-relaxed mb-10 reveal-text">
+                    Crafting immersive digital experiences at the intersection of <span
+                        class="text-white font-bold">Artificial Intelligence</span>, <span
+                        class="text-white font-bold">Design</span>, and <span class="text-white font-bold">Code</span>.
+                </p>
+
+                <div class="flex flex-col md:flex-row gap-6 justify-center items-center reveal-text">
+                    <a href="#work" class="btn-magnetic group">
+                        <span class="btn-fill"></span>
+                        <span
+                            class="relative z-10 font-bold tracking-widest text-sm uppercase group-hover:text-white">Explore
+                            Work</span>
+                    </a>
+                    <a href="#contact"
+                        class="text-sm font-bold uppercase tracking-widest hover:text-cyan-400 transition-colors flex items-center gap-2 text-slate-400 hover:text-cyan-400">
+                        <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                        Available for hire
+                    </a>
+                </div>
+            </div>
+
+            <div class="scroll-indicator">
+                <div class="mouse">
+                    <div class="wheel"></div>
+                </div>
+                <span class="text-[10px] uppercase tracking-widest">Scroll</span>
+            </div>
+        </section>
+
+        <div class="marquee-container">
+            <div class="marquee-content">
+                <span class="marquee-text">Full Stack Development • 3D WebGL Experiences • UI/UX Design • Distributed
+                    Systems • Creative Vibe Coding • </span>
+                <span class="marquee-text">Full Stack Development • 3D WebGL Experiences • UI/UX Design • Distributed
+                    Systems • Creative Vibe Coding • </span>
+            </div>
+        </div>
+
+        <section id="about" class="py-32 px-6 md:px-12 relative">
+            <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-20 items-center">
+                <div class="reveal-img relative">
+                    <div
+                        class="aspect-[4/5] bg-slate-800 rounded-2xl overflow-hidden relative group border border-white/10">
+                        <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop"
+                            alt="Abstract Tech"
+                            class="w-full h-full object-cover opacity-60 group-hover:scale-110 transition duration-700 ease-in-out">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
+                        <div class="absolute bottom-8 left-8 text-white">
+                            <h3 class="text-4xl font-[Syncopate] font-bold">THE<br>VISION</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-8">
+                    <h2 class="text-sm font-bold text-cyan-400 tracking-widest uppercase mb-4">// Who I Am</h2>
+                    <h3 class="text-4xl md:text-6xl font-bold leading-tight reveal-text">
+                        Architecting the <span
+                            class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">Digital
+                            Future</span>.
+                    </h3>
+                    <p class="text-xl text-slate-400 leading-relaxed reveal-text">
+                        I am Ammireddy Ajay Reddy, a creative technologist who leverages AI to push the boundaries of what's possible. Combining a strong foundation in Computer Science with AI-driven development practices, I rapidly prototype, design, and engineer complex digital platforms.
+                    </p>
+                    <p class="text-lg text-slate-500 reveal-text">
+                        From architecting scalable backends to engineering interactive frontends, I leverage AI at every stage to build faster and smarter. I thrive on turning complex requirements into clean, high-impact digital solutions.
+                    </p>
+
+                    <div class="grid grid-cols-2 gap-8 pt-8 reveal-text">
+                        <div>
+                            <h4 class="text-3xl font-bold mb-2 counter" data-target="3">0+</h4>
+                            <p class="text-sm text-slate-500 uppercase tracking-widest">Years Experience</p>
+                        </div>
+                        <div>
+                            <h4 class="text-3xl font-bold mb-2 counter" data-target="20">0+</h4>
+                            <p class="text-sm text-slate-500 uppercase tracking-widest">Projects Shipped</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="work" class="py-32 px-6 md:px-12 bg-black/5" style="transition: background 0.3s">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex justify-between items-end mb-20">
+                    <div>
+                        <h2 class="text-sm font-bold text-cyan-400 tracking-widest uppercase mb-4">// Selected Works
+                        </h2>
+                        <h3 class="text-4xl md:text-6xl font-[Syncopate] font-bold">CASE STUDIES</h3>
+                    </div>
+                    <a href="#"
+                        class="hidden md:flex items-center gap-2 hover:gap-4 transition-all text-sm uppercase tracking-widest">
+                        View Archive <i data-lucide="arrow-right"></i>
+                    </a>
+                </div>
+
+                <div class="bento-grid">
+                    <div class="bento-item col-span-12 md:col-span-8 aspect-[16/9]">
+                        <div class="card-glare"></div>
+                        <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1964&auto=format&fit=crop"
+                            class="bento-img" alt="Project 1">
+                        <div class="bento-overlay">
+                            <h4 class="text-3xl font-bold mb-2">Project Nexus</h4>
+                            <p class="text-slate-300">Real-time Data Visualization Dashboard</p>
+                            <div class="flex gap-2 mt-4">
+                                <span
+                                    class="px-3 py-1 border border-white/20 rounded-full text-xs font-bold">React</span>
+                                <span
+                                    class="px-3 py-1 border border-white/20 rounded-full text-xs font-bold">D3.js</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bento-item col-span-12 md:col-span-4 aspect-[4/3]">
+                        <div class="card-glare"></div>
+                        <img src="https://images.unsplash.com/photo-1558655146-d09347e0b7a9?q=80&w=2070&auto=format&fit=crop"
+                            class="bento-img" alt="Project 2">
+                        <div class="bento-overlay">
+                            <h4 class="text-2xl font-bold mb-2">Cyber Guard</h4>
+                            <p class="text-slate-300">AI-Powered Security</p>
+                            <div class="flex gap-2 mt-4">
+                                <span
+                                    class="px-3 py-1 border border-white/20 rounded-full text-xs font-bold">Python</span>
+                                <span
+                                    class="px-3 py-1 border border-white/20 rounded-full text-xs font-bold">TensorFlow</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bento-item col-span-12 md:col-span-4 aspect-[4/3]">
+                        <div class="card-glare"></div>
+                        <img src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=2070&auto=format&fit=crop"
+                            class="bento-img" alt="Project 3">
+                        <div class="bento-overlay">
+                            <h4 class="text-2xl font-bold mb-2">Neo Commerce</h4>
+                            <p class="text-slate-300">Headless Shopify Build</p>
+                            <div class="flex gap-2 mt-4">
+                                <span
+                                    class="px-3 py-1 border border-white/20 rounded-full text-xs font-bold">Next.js</span>
+                                <span
+                                    class="px-3 py-1 border border-white/20 rounded-full text-xs font-bold">Shopify</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bento-item col-span-12 md:col-span-8 aspect-[16/9]">
+                        <div class="card-glare"></div>
+                        <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=2070&auto=format&fit=crop"
+                            class="bento-img" alt="Project 4">
+                        <div class="bento-overlay">
+                            <h4 class="text-3xl font-bold mb-2">Aether Interface</h4>
+                            <p class="text-slate-300">Spatial Computing UI Kit</p>
+                            <div class="flex gap-2 mt-4">
+                                <span
+                                    class="px-3 py-1 border border-white/20 rounded-full text-xs font-bold">Three.js</span>
+                                <span
+                                    class="px-3 py-1 border border-white/20 rounded-full text-xs font-bold">WebGL</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="lab" class="py-32 px-6 md:px-12">
+            <div class="max-w-7xl mx-auto flex flex-col md:flex-row gap-20">
+                <div class="md:w-1/3">
+                    <h2 class="text-sm font-bold text-cyan-400 tracking-widest uppercase mb-4">// Capabilities</h2>
+                    <h3 class="text-4xl md:text-5xl font-[Syncopate] font-bold mb-8">TECH<br>STACK</h3>
+                    <p class="text-slate-400 leading-relaxed">
+                        I specialize in the JavaScript ecosystem, utilizing modern frameworks to build high-performance
+                        applications. My toolbox is constantly evolving.
+                    </p>
+                </div>
+
+                <div class="md:w-2/3 space-y-4">
+                    <div class="group border-b border-white/10 pb-8 hover:border-white/40 transition-colors">
+                        <div class="flex justify-between items-center cursor-pointer">
+                            <h4 class="text-2xl md:text-3xl font-bold group-hover:pl-4 transition-all duration-300">
+                                Frontend Engineering</h4>
+                            <i data-lucide="arrow-up-right"
+                                class="w-6 h-6 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                        </div>
+                        <div class="h-0 overflow-hidden group-hover:h-auto transition-all duration-500">
+                            <p class="pt-4 text-slate-400">React, Vue, Next.js, Tailwind CSS, GSAP, Three.js, WebGL</p>
+                        </div>
+                    </div>
+
+                    <div class="group border-b border-white/10 pb-8 hover:border-white/40 transition-colors">
+                        <div class="flex justify-between items-center cursor-pointer">
+                            <h4 class="text-2xl md:text-3xl font-bold group-hover:pl-4 transition-all duration-300">
+                                Backend Systems</h4>
+                            <i data-lucide="arrow-up-right"
+                                class="w-6 h-6 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                        </div>
+                        <div class="h-0 overflow-hidden group-hover:h-auto transition-all duration-500">
+                            <p class="pt-4 text-slate-400">Node.js, Python, Go, PostgreSQL, MongoDB, Redis, Docker, AWS
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="group border-b border-white/10 pb-8 hover:border-white/40 transition-colors">
+                        <div class="flex justify-between items-center cursor-pointer">
+                            <h4 class="text-2xl md:text-3xl font-bold group-hover:pl-4 transition-all duration-300">
+                                Creative Design</h4>
+                            <i data-lucide="arrow-up-right"
+                                class="w-6 h-6 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                        </div>
+                        <div class="h-0 overflow-hidden group-hover:h-auto transition-all duration-500">
+                            <p class="pt-4 text-slate-400">Figma, Blender, UI/UX Principles, Motion Design</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="min-h-screen flex items-center justify-center px-6 relative overflow-hidden py-20">
+            <div class="absolute inset-0 z-0 flex items-center justify-center opacity-20 pointer-events-none">
+                <div class="w-[800px] h-[800px] rounded-full border border-white/10 animate-pulse"></div>
+                <div class="absolute w-[600px] h-[600px] rounded-full border border-white/10"
+                    style="animation: spin 20s linear infinite;"></div>
+            </div>
+
+            <div class="max-w-6xl mx-auto w-full z-10">
+                <div class="text-center mb-16">
+                    <p class="text-cyan-400 font-bold tracking-widest uppercase mb-6">Let's build something impossible
+                    </p>
+                    <h2
+                        class="text-5xl md:text-8xl font-[Syncopate] font-bold leading-none hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-cyan-400 hover:to-purple-500 transition-all duration-500 cursor-default">
+                        GET IN TOUCH
+                    </h2>
+                </div>
+
+                <div class="grid lg:grid-cols-2 gap-12 items-start">
+
+                    <div class="space-y-10">
+                        <div class="glass-panel p-8 rounded-2xl">
+                            <h4 class="text-gray-500 uppercase tracking-widest text-xs mb-4">Contact Details</h4>
+
+                            <!-- INTERACTIVE EMAIL -->
+                            <div class="contact-row mb-6">
+                                <div class="interactive-text text-xl md:text-2xl font-bold text-white break-all"
+                                    data-value="ajayreddy190805@gmail.com">
+                                    <!-- JS will inject spans here -->
+                                </div>
+                                <button class="copy-btn" onclick="copyToClipboard('ajayreddy190805@gmail.com', this)"
+                                    title="Copy Email">
+                                    <i data-lucide="copy" class="w-4 h-4"></i>
+                                    <span class="copy-tooltip">COPIED!</span>
+                                </button>
+                            </div>
+
+                            <!-- INTERACTIVE PHONE -->
+                            <div class="contact-row">
+                                <div class="interactive-text text-lg md:text-xl text-slate-400"
+                                    data-value="+91 98765 43210">
+                                    <!-- JS will inject spans here -->
+                                </div>
+                                <button class="copy-btn" onclick="copyToClipboard('+91 98765 43210', this)"
+                                    title="Copy Phone">
+                                    <i data-lucide="copy" class="w-4 h-4"></i>
+                                    <span class="copy-tooltip">COPIED!</span>
+                                </button>
+                            </div>
+
+                            <p class="text-slate-500 mt-6 text-sm">Hyderabad, India</p>
+                        </div>
+
+                        <div class="glass-panel p-8 rounded-2xl">
+                            <h4 class="text-gray-500 uppercase tracking-widest text-xs mb-4">Socials</h4>
+                            <div class="flex gap-8">
+                                <a href="https://github.com/ajayreddy19080507" class="social-btn social-github">
+                                    <div class="social-base"></div>
+                                    <i data-lucide="github"></i>
+                                </a>
+                                <a href="https://www.linkedin.com/in/ajay-reddy-ammireddy/"
+                                    class="social-btn social-linkedin">
+                                    <div class="social-base"></div>
+                                    <i data-lucide="linkedin"></i>
+                                </a>
+                                <a href="https://www.instagram.com/_.ajay.reddy._/" class="social-btn social-instagram">
+                                    <div class="social-base"></div>
+                                    <i data-lucide="instagram"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-8 md:p-12 rounded-3xl relative">
+                        <form action="https://formspree.io/f/YOUR_FORM_ID" method="POST" class="space-y-8">
+                            <div>
+                                <input type="text" name="name" placeholder="Name" required class="form-input">
+                            </div>
+                            <div>
+                                <input type="email" name="email" placeholder="Email Address" required
+                                    class="form-input">
+                            </div>
+                            <div>
+                                <textarea name="message" rows="4" placeholder="Your Message" required
+                                    class="form-input resize-none"></textarea>
+                            </div>
+
+                            <button type="submit" class="btn-magnetic group w-full">
+                                <span class="btn-fill"></span>
+                                <span
+                                    class="relative z-10 font-bold tracking-widest text-sm uppercase group-hover:text-black">Send
+                                    Message</span>
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <footer
+            class="py-10 px-6 border-t border-white/10 flex flex-col md:flex-row justify-between items-center text-xs text-slate-500 uppercase tracking-widest">
+            <div>
+                &copy; 2024 Ammireddy Ajay Reddy
+            </div>
+            <div class="mt-4 md:mt-0">
+                Local Time: <span id="time">00:00</span> IST
+            </div>
+            <div class="mt-4 md:mt-0">
+                Designed & Coded with Passion
+            </div>
+        </footer>
+
+    </main>
+
+    <script>
+        // 0. FAILSAFE: REMOVE PRELOADER IF STUCK
+        setTimeout(() => {
+            const preloader = document.getElementById('preloader');
+            if (preloader && window.getComputedStyle(preloader).display !== 'none') {
+                console.log("Failsafe triggered: removing preloader");
+                preloader.style.transition = 'transform 0.8s ease-in-out';
+                preloader.style.transform = 'translateY(-100%)';
+            }
+        }, 5000);
+
+        // 1. INITIALIZE ICONS
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+
+        // 2. TIME UPDATE
+        function updateTime() {
+            const now = new Date();
+            const timeElement = document.getElementById('time');
+            if (timeElement) {
+                timeElement.innerText = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+            }
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // 3. SMOOTH SCROLL (LENIS)
+        let lenis;
+        if (typeof Lenis !== 'undefined') {
+            lenis = new Lenis({
+                duration: 1.2,
+                easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+                direction: 'vertical',
+                gestureDirection: 'vertical',
+                smooth: true,
+                mouseMultiplier: 1,
+                smoothTouch: false,
+                touchMultiplier: 2,
+            });
+
+            function raf(time) {
+                lenis.raf(time);
+                requestAnimationFrame(raf);
+            }
+            requestAnimationFrame(raf);
+        }
+
+        // 4. THEME TOGGLE LOGIC
+        const themeBtn = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        let threeParticlesMaterial; // Store reference to update color
+
+        function updateThreeJSTheme(isLight) {
+            if (threeParticlesMaterial) {
+                // Change particle color: Dark mode = Cyan, Light mode = Black/Dark Grey
+                threeParticlesMaterial.color.setHex(isLight ? 0x111111 : 0x08d9d6);
+            }
+        }
+
+        // Check Local Storage on load
+        if (localStorage.getItem('theme') === 'light') {
+            document.body.classList.add('light-mode');
+            themeIcon.setAttribute('data-lucide', 'moon');
+            themeIcon.style.color = 'black';
+            lucide.createIcons();
+        }
+
+        themeBtn.addEventListener('click', () => {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+
+            if (isLight) {
+                localStorage.setItem('theme', 'light');
+                themeIcon.setAttribute('data-lucide', 'moon');
+                themeIcon.style.color = 'black';
+            } else {
+                localStorage.setItem('theme', 'dark');
+                themeIcon.setAttribute('data-lucide', 'sun');
+                themeIcon.style.color = 'white';
+            }
+            lucide.createIcons();
+            updateThreeJSTheme(isLight);
+        });
+
+        // 5. COPY TO CLIPBOARD
+
+        // Split text into spans for hover effect
+        document.querySelectorAll('.interactive-text').forEach(el => {
+            const text = el.getAttribute('data-value');
+            el.innerHTML = text.split('').map(char =>
+                char === ' '
+                    ? `<span class="interactive-char">&nbsp;</span>`
+                    : `<span class="interactive-char">${char}</span>`
+            ).join('');
+        });
+
+        // Fixed Copy Functionality
+        async function copyToClipboard(text, btnElement) {
+            try {
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(text);
+                } else {
+                    const textArea = document.createElement("textarea");
+                    textArea.value = text;
+                    textArea.style.position = "fixed";
+                    textArea.style.left = "-9999px";
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                }
+
+                const icon = btnElement.querySelector('i');
+                btnElement.classList.add('copied');
+
+                gsap.fromTo(btnElement,
+                    { boxShadow: "0 0 0 0 rgba(8, 217, 214, 0.7)" },
+                    { boxShadow: "0 0 0 20px rgba(8, 217, 214, 0)", duration: 0.6, ease: "power2.out" }
+                );
+
+                gsap.to(icon, {
+                    rotate: 360,
+                    scale: 0.5,
+                    opacity: 0,
+                    duration: 0.2,
+                    onComplete: () => {
+                        icon.setAttribute('data-lucide', 'check');
+                        icon.classList.add('text-green-400');
+                        lucide.createIcons();
+
+                        gsap.fromTo(icon,
+                            { scale: 0.5, opacity: 0 },
+                            { scale: 1.2, opacity: 1, duration: 0.3, ease: "back.out(2)" }
+                        );
+                    }
+                });
+
+                setTimeout(() => {
+                    btnElement.classList.remove('copied');
+
+                    gsap.to(icon, {
+                        scale: 0.5,
+                        opacity: 0,
+                        duration: 0.2,
+                        onComplete: () => {
+                            icon.setAttribute('data-lucide', 'copy');
+                            icon.classList.remove('text-green-400');
+                            lucide.createIcons();
+
+                            gsap.to(icon, { scale: 1, opacity: 1, duration: 0.2 });
+                        }
+                    });
+                }, 2000);
+
+            } catch (err) {
+                console.error('Failed to copy', err);
+            }
+        }
+
+        // 6. AI ASSISTANT LOGIC (GEMINI API) WITH FILE SUPPORT
+        const aiToggle = document.getElementById('ai-toggle');
+        const aiModal = document.getElementById('ai-modal');
+        const closeAi = document.getElementById('close-ai');
+        const aiInput = document.getElementById('ai-input');
+        const aiSend = document.getElementById('ai-send');
+        const aiMessages = document.getElementById('ai-messages');
+        const aiAvatarImg = document.getElementById('ai-avatar-img');
+
+        // File Upload Elements
+        const aiAttachBtn = document.getElementById('ai-attach');
+        const aiFileInput = document.getElementById('ai-file-input');
+        const fileChip = document.getElementById('file-chip');
+        const filenameSpan = document.getElementById('filename');
+        const removeFileBtn = document.getElementById('remove-file');
+        const dropOverlay = document.getElementById('drop-overlay');
+
+        let currentFile = null;
+
+        // Toggle Modal
+        aiToggle.addEventListener('click', () => aiModal.classList.add('active'));
+        closeAi.addEventListener('click', () => aiModal.classList.remove('active'));
+
+        // Handle File Attachment
+        aiAttachBtn.addEventListener('click', () => aiFileInput.click());
+
+        aiFileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileSelect(e.target.files[0]);
+            }
+        });
+
+        // Drag & Drop Logic
+        aiModal.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            aiModal.classList.add('drag-over');
+        });
+
+        aiModal.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            if (e.relatedTarget && !aiModal.contains(e.relatedTarget)) {
+                aiModal.classList.remove('drag-over');
+            }
+        });
+
+        // Ensure overlay doesn't flicker
+        dropOverlay.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            aiModal.classList.remove('drag-over');
+        });
+
+        aiModal.addEventListener('drop', (e) => {
+            e.preventDefault();
+            aiModal.classList.remove('drag-over');
+            if (e.dataTransfer.files.length > 0) {
+                handleFileSelect(e.dataTransfer.files[0]);
+            }
+        });
+
+        function handleFileSelect(file) {
+            currentFile = file;
+            filenameSpan.textContent = file.name;
+            fileChip.classList.add('active');
+            // Reset input so same file can be selected again if needed
+            aiFileInput.value = '';
+        }
+
+        removeFileBtn.addEventListener('click', () => {
+            currentFile = null;
+            fileChip.classList.remove('active');
+        });
+
+        // Send Message Logic
+        async function sendMessage() {
+            const text = aiInput.value.trim();
+
+            // Allow sending if text exists OR file exists
+            if (!text && !currentFile) return;
+
+            // 1. Add User Message (Text + File indicator)
+            let userHtml = text;
+            if (currentFile) {
+                userHtml += `<br><small class="opacity-70 mt-1 block"><i data-lucide="paperclip" class="w-3 h-3 inline"></i> ${currentFile.name}</small>`;
+            }
+            appendMessage(userHtml, 'user');
+
+            // Clear Inputs
+            aiInput.value = '';
+            currentFile = null;
+            fileChip.classList.remove('active');
+
+            // 2. Add Loading Indicator
+            const loadingId = appendLoading();
+
+            try {
+                // 3. Call Gemini API
+                const apiKey = "AIzaSyDV8RFBsaJoYjaHafsdJdZXuhW8lPaSgG8"; // Empty string
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{ text: text || "Analyze this file." }] // Logic to handle file would go here (base64)
+                        }]
+                    })
+                });
+
+                const data = await response.json();
+                document.getElementById(loadingId).remove();
+
+                // 4. Handle Response
+                if (data.candidates && data.candidates[0].content) {
+                    const reply = data.candidates[0].content.parts[0].text;
+                    appendMessage(marked.parse(reply), 'bot');
+                } else {
+                    appendMessage("I'm sorry, I couldn't process that request right now.", 'bot');
+                }
+
+            } catch (error) {
+                if (document.getElementById(loadingId)) document.getElementById(loadingId).remove();
+                appendMessage("Connection error. Please try again later.", 'bot');
+                console.error(error);
+            }
+        }
+
+        function appendMessage(html, sender) {
+            const div = document.createElement('div');
+            div.className = `message ${sender}`;
+            div.innerHTML = html;
+            aiMessages.appendChild(div);
+            aiMessages.scrollTop = aiMessages.scrollHeight;
+            lucide.createIcons(); // Refresh icons for file indicator
+        }
+
+        function appendLoading() {
+            const id = 'loading-' + Date.now();
+            const div = document.createElement('div');
+            div.className = 'message bot';
+            div.id = id;
+            div.innerHTML = `<div class="typing-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
+            aiMessages.appendChild(div);
+            aiMessages.scrollTop = aiMessages.scrollHeight;
+            return id;
+        }
+
+        aiSend.addEventListener('click', sendMessage);
+        aiInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+
+        // 7. ANIMATIONS & PRELOADER (FIXED)
+        window.addEventListener('load', () => {
+            const preloader = document.getElementById('preloader');
+            const loaderBar = document.getElementById('loader-bar');
+
+            if (typeof gsap !== 'undefined') {
+                gsap.registerPlugin(ScrollTrigger);
+
+                // --- CUSTOM CURSOR (HUD STYLE) ---
+                const cursor = document.getElementById('cursor-ui');
+                const xTo = gsap.quickTo(cursor, "x", { duration: 0.1, ease: "power3" }),
+                    yTo = gsap.quickTo(cursor, "y", { duration: 0.1, ease: "power3" });
+
+                window.addEventListener("mousemove", e => {
+                    xTo(e.clientX);
+                    yTo(e.clientY);
+
+                    // --- 3D AVATAR EYE TRACKING ---
+                    // Calculate position relative to the avatar center
+                    const aiBtn = document.getElementById('ai-toggle');
+                    if (aiBtn && aiAvatarImg) {
+                        const rect = aiBtn.getBoundingClientRect();
+                        const centerX = rect.left + rect.width / 2;
+                        const centerY = rect.top + rect.height / 2;
+
+                        const deltaX = e.clientX - centerX;
+                        const deltaY = e.clientY - centerY;
+
+                        // Limit the rotation
+                        const rotateX = Math.max(-20, Math.min(20, -deltaY / 20));
+                        const rotateY = Math.max(-20, Math.min(20, deltaX / 20));
+
+                        aiAvatarImg.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+                    }
+
+                    // --- SOCIAL BUTTONS TILT ---
+                    const socialBtns = document.querySelectorAll('.social-btn');
+                    socialBtns.forEach(btn => {
+                        const rect = btn.getBoundingClientRect();
+                        // Only animate if mouse is close/over
+                        const distance = Math.hypot(e.clientX - (rect.left + rect.width / 2), e.clientY - (rect.top + rect.height / 2));
+
+                        if (distance < 150) { // Interaction radius
+                            const x = e.clientX - rect.left;
+                            const y = e.clientY - rect.top;
+                            const centerX = rect.width / 2;
+                            const centerY = rect.height / 2;
+
+                            const rotateX = ((y - centerY) / centerY) * -25;
+                            const rotateY = ((x - centerX) / centerX) * 25;
+
+                            const base = btn.querySelector('.social-base');
+                            if (base) {
+                                base.style.transform = `perspective(500px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+                            }
+                        } else {
+                            // Reset
+                            const base = btn.querySelector('.social-base');
+                            if (base) {
+                                base.style.transform = `perspective(500px) rotateX(0deg) rotateY(0deg)`;
+                            }
+                        }
+                    });
+                });
+
+                // Add hover classes
+                const interactiveElements = document.querySelectorAll('a, button, input, textarea, .bento-item, .hover-magnetic, .interactive-char, .social-btn, .floating-ui-btn');
+                interactiveElements.forEach(el => {
+                    el.addEventListener('mouseenter', () => document.body.classList.add('hover-active'));
+                    el.addEventListener('mouseleave', () => document.body.classList.remove('hover-active'));
+                });
+
+                // Add Click Animation
+                window.addEventListener('mousedown', () => {
+                    document.body.classList.add('cursor-clicked');
+                    gsap.to(cursor, { scale: 0.8, duration: 0.1 });
+                });
+                window.addEventListener('mouseup', () => {
+                    document.body.classList.remove('cursor-clicked');
+                    gsap.to(cursor, { scale: 1, duration: 0.3, ease: 'elastic.out(1, 0.3)' });
+                });
+
+                // --- PAGE ANIMATIONS ---
+                // Finish loading bar animation smoothly (from wherever CSS left it to 100%)
+                const tl = gsap.timeline();
+
+                tl.to(loaderBar, {
+                    width: '100%',
+                    duration: 0.5,
+                    ease: "power2.out"
+                })
+                    .to(preloader, {
+                        yPercent: -100,
+                        duration: 1,
+                        ease: "power3.inOut"
+                    })
+                    .from('.hero-title', {
+                        y: 100,
+                        opacity: 0,
+                        duration: 1,
+                        stagger: 0.1,
+                        ease: "power3.out"
+                    }, "-=0.5");
+
+                // REVEAL TEXT ANIMATION
+                const revealElements = document.querySelectorAll('.reveal-text');
+                revealElements.forEach(element => {
+                    gsap.fromTo(element,
+                        { y: 50, opacity: 0 },
+                        {
+                            y: 0,
+                            opacity: 1,
+                            duration: 1,
+                            stagger: 0.2,
+                            ease: "power3.out",
+                            scrollTrigger: {
+                                trigger: element,
+                                start: "top 85%",
+                            }
+                        }
+                    );
+                });
+
+                // BENTO GRID VISIBILITY
+                gsap.from(".bento-item", {
+                    y: 50,
+                    opacity: 0,
+                    duration: 0.8,
+                    stagger: 0.1,
+                    ease: "power3.out",
+                    scrollTrigger: {
+                        trigger: ".bento-grid",
+                        start: "top 90%", // Triggers sooner
+                        toggleActions: "play none none reverse"
+                    }
+                });
+
+                // MAGNETIC BUTTON LOGIC
+                const magneticBtns = document.querySelectorAll('.hover-magnetic, .btn-magnetic');
+                magneticBtns.forEach(btn => {
+                    btn.addEventListener('mousemove', (e) => {
+                        const position = btn.getBoundingClientRect();
+                        const x = e.clientX - position.left - position.width / 2;
+                        const y = e.clientY - position.top - position.height / 2;
+
+                        const strength = btn.getAttribute('data-strength') || 30;
+
+                        gsap.to(btn, {
+                            x: x * 0.5,
+                            y: y * 0.5,
+                            duration: 0.3,
+                            ease: "power2.out"
+                        });
+
+                        if (btn.querySelector('span')) {
+                            gsap.to(btn.querySelector('span'), {
+                                x: x * 0.3,
+                                y: y * 0.3,
+                                duration: 0.3
+                            });
+                        }
+                    });
+
+                    btn.addEventListener('mouseleave', () => {
+                        gsap.to(btn, { x: 0, y: 0, duration: 0.5, ease: "elastic.out(1, 0.3)" });
+                        if (btn.querySelector('span')) {
+                            gsap.to(btn.querySelector('span'), { x: 0, y: 0, duration: 0.5 });
+                        }
+                    });
+                });
+
+            } else {
+                if (loaderBar) loaderBar.style.width = '100%';
+                if (preloader) {
+                    setTimeout(() => {
+                        preloader.style.transition = 'transform 0.8s ease-in-out';
+                        preloader.style.transform = 'translateY(-100%)';
+                    }, 500);
+                }
+            }
+        });
+
+        // 3D TILT LOGIC FOR CARDS
+        const cards = document.querySelectorAll('.bento-item');
+        cards.forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+
+                const rotateX = ((y - centerY) / centerY) * -10; // Max 10deg rotation
+                const rotateY = ((x - centerX) / centerX) * 10;
+
+                // Glare pos
+                const glare = card.querySelector('.card-glare');
+                if (glare) {
+                    glare.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(255,255,255,0.3), transparent 70%)`;
+                }
+
+                gsap.to(card, {
+                    transform: `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`,
+                    duration: 0.1,
+                    ease: "power1.out"
+                });
+            });
+
+            card.addEventListener('mouseleave', () => {
+                gsap.to(card, {
+                    transform: `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`,
+                    duration: 0.5,
+                    ease: "elastic.out(1, 0.5)"
+                });
+            });
+        });
+
+        // --------------------------------------------------------------------------
+        //                                THREE.JS BACKGROUND
+        // --------------------------------------------------------------------------
+        if (typeof THREE !== 'undefined') {
+            const canvasContainer = document.getElementById('webgl-container');
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            if (canvasContainer) canvasContainer.appendChild(renderer.domElement);
+
+            // Particles
+            const particlesGeometry = new THREE.BufferGeometry();
+            const particlesCount = 700;
+
+            const posArray = new Float32Array(particlesCount * 3);
+
+            for (let i = 0; i < particlesCount * 3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 15;
+            }
+
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+
+            // Material stored in global variable for theme switching
+            threeParticlesMaterial = new THREE.PointsMaterial({
+                size: 0.015,
+                color: 0x08d9d6,
+                transparent: true,
+                opacity: 0.8,
+                blending: THREE.AdditiveBlending
+            });
+
+            const particlesMesh = new THREE.Points(particlesGeometry, threeParticlesMaterial);
+            scene.add(particlesMesh);
+
+            // Apply correct color immediately if starting in light mode
+            if (localStorage.getItem('theme') === 'light') {
+                updateThreeJSTheme(true);
+            }
+
+            // Connecting Lines (Abstract Mesh)
+            const geometry = new THREE.IcosahedronGeometry(10, 2);
+            const material = new THREE.MeshBasicMaterial({
+                color: 0x222222,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.05
+            });
+            const sphere = new THREE.Mesh(geometry, material);
+            scene.add(sphere);
+
+            camera.position.z = 3;
+
+            let targetX = 0;
+            let targetY = 0;
+
+            const windowHalfX = window.innerWidth / 2;
+            const windowHalfY = window.innerHeight / 2;
+
+            document.addEventListener('mousemove', (event) => {
+                targetX = (event.clientX - windowHalfX) * 0.001;
+                targetY = (event.clientY - windowHalfY) * 0.001;
+            });
+
+            const clock = new THREE.Clock();
+
+            const tick = () => {
+                const elapsedTime = clock.getElapsedTime();
+
+                particlesMesh.rotation.y = elapsedTime * 0.05;
+                particlesMesh.rotation.x += 0.05 * (targetY - particlesMesh.rotation.x);
+                particlesMesh.rotation.y += 0.05 * (targetX - particlesMesh.rotation.y);
+
+                sphere.rotation.y = elapsedTime * 0.1;
+
+                camera.position.y += 0.05 * (targetY * 2 - camera.position.y);
+                camera.position.x += 0.05 * (targetX * 2 - camera.position.x);
+                camera.lookAt(scene.position);
+                renderer.render(scene, camera);
+                requestAnimationFrame(tick);
+            }
+            tick();
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        }
+    </script>
+</body>
+
+</html>
