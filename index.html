@@ -1220,14 +1220,24 @@
         /* SCROLL DOWN INDICATOR */
         .scroll-indicator {
             position: absolute;
-            bottom: 40px;
+            bottom: 24px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px;
-            opacity: 0.5;
+            gap: 8px;
+            opacity: 0.45;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 10;
+        }
+
+        /* Prevent overlap on laptops, landscape, or shorter displays */
+        @media (max-height: 820px), (max-width: 768px) {
+            .scroll-indicator {
+                display: none !important;
+            }
         }
 
         .mouse {
@@ -2022,24 +2032,24 @@
 
     <main>
 
-        <section id="home" class="h-screen w-full flex items-center justify-center relative px-6">
+        <section id="home" class="min-h-screen py-24 md:py-28 w-full flex flex-col items-center justify-center relative px-6">
             <div class="text-center z-10 relative">
                 <div class="overflow-hidden mb-2">
-                    <h2 class="hero-subtitle text-slate-300">CREATIVE TECHNOLOGIST & ENGINEER</h2>
+                    <h2 class="hero-subtitle text-slate-300">CREATIVE TECHNOLOGIST &amp; ENGINEER</h2>
                 </div>
 
-                <div class="glitch-wrapper mb-6">
+                <div class="glitch-wrapper mb-4 md:mb-6">
                     <h1 class="hero-title glitch" data-text="AMMIREDDY">AMMIREDDY</h1>
                     <h1 class="hero-title glitch hero-stroked" data-text="AJAY REDDY">AJAY REDDY</h1>
                 </div>
 
-                <p class="max-w-2xl mx-auto text-lg md:text-xl text-slate-400 leading-relaxed mb-10 reveal-text">
+                <p class="max-w-2xl mx-auto text-base sm:text-lg md:text-xl text-slate-400 leading-relaxed mb-8 md:mb-10 reveal-text">
                     Crafting immersive digital experiences at the intersection of <span
                         class="text-white font-bold">Artificial Intelligence</span>, <span
                         class="text-white font-bold">Design</span>, and <span class="text-white font-bold">Code</span>.
                 </p>
 
-                <div class="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center items-center reveal-text">
+                <div class="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center items-center reveal-text mb-4">
                     <a href="#work" class="btn-magnetic group">
                         <span class="btn-fill"></span>
                         <span
